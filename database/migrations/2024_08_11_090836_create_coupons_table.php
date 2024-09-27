@@ -16,7 +16,9 @@ class CreateCouponsTable extends Migration
             $table->timestamp('valid_from')->nullable();
             $table->timestamp('valid_until')->nullable();
             $table->integer('usage_limit')->nullable(); // Maximum number of times this coupon can be used
+            $table->integer('usage_user_limit')->nullable(); // Maximum number of times this coupon can be used
             $table->integer('used_count')->default(0); // Track how many times it has been used
+            $table->enum('status', ['active', 'inactive'])->default('active'); // New status column
             $table->timestamps();
         });
     }

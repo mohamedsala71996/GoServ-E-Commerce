@@ -16,7 +16,9 @@ class Coupon extends Model
         'valid_from',
         'valid_until',
         'usage_limit',
+        'usage_user_limit',
         'used_count',
+        'status'
     ];
 
     // Check if the coupon is valid based on date and usage
@@ -26,6 +28,7 @@ class Coupon extends Model
 
         return $this->valid_from <= $now &&
                $this->valid_until >= $now &&
+               $this->status == 'active' &&
                ($this->usage_limit === null || $this->used_count < $this->usage_limit);
     }
 
@@ -48,5 +51,44 @@ class Coupon extends Model
     {
         $this->used_count++;
         $this->save();
+    }
+
+
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)->withPivot('times_used')->withTimestamps();
+    }
+
+    // Check if a user has reached their limit
+    public function hasReachedUserLimit($user)
+    {
+        $userCoupon = $this->users()->where('user_id', $user->id)->first();
+
+        if ($userCoupon && $userCoupon->pivot->times_used >= $this->usage_user_limit) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Increment the user's coupon usage
+    public function incrementUserUsage($user)
+    {
+        $userCoupon = $this->users()->where('user_id', $user->id)->first();
+
+        if ($userCoupon) {
+            $this->users()->updateExistingPivot($user->id, [
+                'times_used' => $userCoupon->pivot->times_used + 1
+            ]);
+        } else {
+            $this->users()->attach($user->id, ['times_used' => 1]);
+        }
+    }
+
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 }

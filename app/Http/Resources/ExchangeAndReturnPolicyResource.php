@@ -17,6 +17,7 @@ class ExchangeAndReturnPolicyResource extends JsonResource
         return [
             'id' => $this->id,
             'description' => $this->getTranslation('description', app()->getLocale()),
+            'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

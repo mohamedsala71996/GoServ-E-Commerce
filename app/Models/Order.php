@@ -15,10 +15,11 @@ class Order extends Model
         'status',
         'tracking_number',
         'coupon_discount',
+        'coupon_id',
         'shipping_amount',
         'total_cost',
         'transaction_id',
-        'source_data_sub_type'
+        'source_data_sub_type',
     ];
 
     public function items()
@@ -34,5 +35,8 @@ class Order extends Model
         return $this->hasOne(userDetail::class,'order_id');
     }
 
-
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
 }

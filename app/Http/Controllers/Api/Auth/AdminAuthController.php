@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Auth\AdminLoginRequest;
+use App\Http\Requests\Api\Auth\AdminRegisterRequest;
 use App\Http\Requests\Api\Auth\UserLoginRequest; // You can create a similar request for Admin
 use App\Http\Requests\Api\Auth\UserRegisterRequest; // You can create a similar request for Admin
 use App\Models\Admin;
@@ -11,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminAuthController extends Controller
 {
-    public function register(UserRegisterRequest $request)
+    public function register(AdminRegisterRequest $request)
     {
         $validated = $request->validated();
 
@@ -32,7 +34,7 @@ class AdminAuthController extends Controller
     }
 
     // Log in an admin
-    public function login(UserLoginRequest $request)
+    public function login(AdminLoginRequest $request)
     {
         $credentials = $request->only('email', 'password');
 

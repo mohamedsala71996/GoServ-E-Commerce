@@ -12,7 +12,7 @@ class ProductReviewController extends Controller
 {
     public function index()
     {
-        $reviews = ProductReview::with(['user', 'product'])->where('status','approved')->get();
+        $reviews = ProductReview::with(['user', 'product','replies'])->where('status','approved')->get();
         return ProductReviewResource::collection($reviews);
     }
 
@@ -28,7 +28,7 @@ class ProductReviewController extends Controller
 
     public function getReviewsByProduct($productId)
     {
-        $reviews = ProductReview::with(['user', 'product'])
+        $reviews = ProductReview::with(['user', 'product','replies'])
             ->where('product_id', $productId)
             ->where('status', 'approved')
             ->get();

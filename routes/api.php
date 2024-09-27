@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\Dashboard\BrandController;
 use App\Http\Controllers\Api\Dashboard\CategoryController;
 use App\Http\Controllers\Api\Dashboard\ColorController;
 use App\Http\Controllers\Api\Dashboard\ContactController;
-use App\Http\Controllers\Api\Dashboard\ExchangeAndReturnPolicyController;
+use App\Http\Controllers\Api\Dashboard\Policies\ExchangeAndReturnPolicyController;
 use App\Http\Controllers\Api\Dashboard\OfferController;
 use App\Http\Controllers\Api\Dashboard\PreferProductController;
 use App\Http\Controllers\Api\Dashboard\ProductColorPhotoController;
@@ -22,7 +22,6 @@ use App\Http\Controllers\Api\Website\BrandController as WebsiteBrandController;
 use App\Http\Controllers\Api\Website\CartController;
 use App\Http\Controllers\Api\Website\CategoryController as WebsiteCategoryController;
 use App\Http\Controllers\Api\Website\ContactController as WebsiteContactController;
-use App\Http\Controllers\Api\Website\ExchangeAndReturnPolicyController as WebsiteExchangeAndReturnPolicyController;
 use App\Http\Controllers\Api\Website\PaymobController;
 use App\Http\Controllers\Api\Website\PreferProductController as WebsitePreferProductController;
 use App\Http\Controllers\Api\Website\ProductController as WebsiteProductController;
@@ -33,15 +32,26 @@ use App\Http\Controllers\Api\Dashboard\AdminController;
 use App\Http\Controllers\Api\Dashboard\AnalyticsController;
 use App\Http\Controllers\Api\Dashboard\BannerController;
 use App\Http\Controllers\Api\Dashboard\CityController;
-use App\Http\Controllers\Api\Dashboard\CouponController;
+use App\Http\Controllers\Api\Dashboard\Carts\CartAnalyticsController;
+use App\Http\Controllers\Api\Dashboard\Coupons\CouponAnalyticsController;
+use App\Http\Controllers\Api\Dashboard\Coupons\CouponController;
 use App\Http\Controllers\Api\Dashboard\GlobalOfferController;
+use App\Http\Controllers\Api\Dashboard\GoalController;
 use App\Http\Controllers\Api\Dashboard\OrderController as DashboardOrderController;
 use App\Http\Controllers\Api\Dashboard\OrderDetailController;
 use App\Http\Controllers\Api\Dashboard\OrderTaxController;
-use App\Http\Controllers\Api\Dashboard\ProductReviewController as DashboardProductReviewController;
+use App\Http\Controllers\Api\Dashboard\Policies\PrivacyPolicyController;
+use App\Http\Controllers\Api\Dashboard\Policies\TermsConditionController;
+use App\Http\Controllers\Api\Dashboard\ReviewsQuestions\ProductReviewController as DashboardProductReviewController;
+use App\Http\Controllers\Api\Dashboard\ReviewsQuestions\QuestionsController;
+use App\Http\Controllers\Api\Dashboard\Reports\MostRequestedReportController;
+use App\Http\Controllers\Api\Dashboard\Reports\MostSearchedController;
+use App\Http\Controllers\Api\Dashboard\Reports\ProductReportController;
+use App\Http\Controllers\Api\Dashboard\Reports\SalesReportController;
+use App\Http\Controllers\Api\Dashboard\Reports\UserReportController;
 use App\Http\Controllers\Api\Dashboard\ReturnAndReplacementController as DashboardReturnAndReplacementController;
 use App\Http\Controllers\Api\Dashboard\ReturnSettingController;
-use App\Http\Controllers\Api\Dashboard\SalesReportController;
+use App\Http\Controllers\Api\Dashboard\ReviewsQuestions\ReviewsQuestionsSearchController;
 use App\Http\Controllers\Api\Dashboard\ShippingSettingsController;
 use App\Http\Controllers\Api\Dashboard\ShippingWeightController;
 use App\Http\Controllers\Api\Dashboard\UserController as DashboardUserController;
@@ -49,7 +59,10 @@ use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\Website\BannerController as WebsiteBannerController;
 use App\Http\Controllers\Api\Website\CheckoutController;
 use App\Http\Controllers\Api\Website\GlobalOfferController as WebsiteGlobalOfferController;
+use App\Http\Controllers\Api\Website\NotificationController;
 use App\Http\Controllers\Api\Website\OrderController;
+use App\Http\Controllers\Api\Website\PolicyController;
+use App\Http\Controllers\Api\Website\QuestionController;
 use App\Http\Controllers\Api\Website\ReturnAndReplacementController;
 use App\Http\Controllers\Api\Website\SearchController;
 use App\Http\Controllers\Api\Website\SectionController as WebsiteSectionController;
@@ -78,8 +91,8 @@ Route::prefix('dashboard/admin')->group(function () {
 });
 
 //    -------------------------------------------  dashboard  --------------------------------------
-// Route::middleware(['auth:sanctum,admin', 'type.admin'])->prefix('dashboard')->group(function () {
-Route::prefix('dashboard')->group(function () {
+Route::middleware(['auth:sanctum'])->prefix('dashboard')->group(function () {
+    // Route::prefix('dashboard')->group(function () {
 
     //admins crud
     Route::resource('admins', AdminController::class);
@@ -166,16 +179,59 @@ Route::prefix('dashboard')->group(function () {
     Route::apiResource('about-store', AboutOurStoreController::class);
 
     //exchange-policy
-    Route::apiResource('exchange-policy', ExchangeAndReturnPolicyController::class);
+    // Route::apiResource('exchange-policy', ExchangeAndReturnPolicyController::class);
+    Route::get('/get-exchange-policy', [ExchangeAndReturnPolicyController::class, 'index']);
+    Route::post('/create-exchange-policy', [ExchangeAndReturnPolicyController::class, 'store']);
+    Route::post('/update-exchange-policy', [ExchangeAndReturnPolicyController::class, 'update']);
+    Route::post('/delete-exchange-policy', [ExchangeAndReturnPolicyController::class, 'destroy']);
+    Route::post('/set-status', [ExchangeAndReturnPolicyController::class, 'setStatus']);
+
+    // privacy-policy
+    Route::get('/get-privacy-policy', [PrivacyPolicyController::class, 'index']);
+    Route::post('/create-privacy-policy', [PrivacyPolicyController::class, 'store']);
+    Route::post('/update-privacy-policy', [PrivacyPolicyController::class, 'update']);
+    Route::post('/delete-privacy-policy', [PrivacyPolicyController::class, 'destroy']);
+    Route::post('/set-status-privacy-policy', [PrivacyPolicyController::class, 'setStatus']);
+
+    // terms-conditions
+    Route::get('/get-terms-conditions', [TermsConditionController::class, 'index']);
+    Route::post('/create-terms-conditions', [TermsConditionController::class, 'store']);
+    Route::post('/update-terms-conditions', [TermsConditionController::class, 'update']);
+    Route::post('/delete-terms-conditions', [TermsConditionController::class, 'destroy']);
+    Route::post('/set-status-terms-conditions', [TermsConditionController::class, 'setStatus']);
+
 
 
     Route::get('/sections', [SectionController::class, 'index']);
 
     Route::post('/sections/order', [SectionController::class, 'updateOrder']);
 
+    // reviews
     Route::get('/pending-reviews', [DashboardProductReviewController::class, 'index']);
 
     Route::put('/setStatus-review/{id}', [DashboardProductReviewController::class, 'setStatus']);
+
+    Route::post('/store-reply/{reviewId}', [DashboardProductReviewController::class, 'storeReply']);
+
+    Route::post('/product-review-delete/{id}', [DashboardProductReviewController::class, 'destroy']);
+
+    //questions
+    Route::get('/pending-questions', [QuestionsController::class, 'index']);
+
+    Route::put('/setStatus-question/{id}', [QuestionsController::class, 'setStatus']);
+
+    Route::post('/store-question-reply/{questionId}', [QuestionsController::class, 'storeReply']);
+
+    Route::post('/question-delete/{id}', [QuestionsController::class, 'destroy']);
+
+    // reviews - questions search
+    Route::get('/reviews-search', [ReviewsQuestionsSearchController::class, 'reviewSearch']);
+
+    Route::get('/questions-search', [ReviewsQuestionsSearchController::class, 'questionSearch']);
+
+    Route::get('/search', [ReviewsQuestionsSearchController::class, 'search']);
+
+
 
 
     // orders details
@@ -218,7 +274,16 @@ Route::prefix('dashboard')->group(function () {
 
     Route::post('coupons/update/{id}', [CouponController::class, 'update']);
 
+    Route::post('coupons/update-status/{id}', [CouponController::class, 'updateStatus']);
+
     Route::post('coupons/destroy/{id}', [CouponController::class, 'destroy']);
+
+    // Coupon Analytics
+    Route::get('coupon-use-count/{id}', [CouponAnalyticsController::class, 'getCouponUsageStats']);
+
+    Route::get('coupon-orders/{id}', [CouponAnalyticsController::class, 'getCouponOrders']);
+
+    Route::get('/coupons/search', [CouponAnalyticsController::class, 'searchCoupons']);
 
 
     //cities
@@ -280,7 +345,7 @@ Route::prefix('dashboard')->group(function () {
     // ReturnSetting
     Route::get('return-settings', [ReturnSettingController::class, 'index']);
     Route::post('return-settings', [ReturnSettingController::class, 'update']);
-   //order update status
+    //order update status
     Route::post('/order-status/{orderId}', [DashboardOrderController::class, 'updateStatus']);
     // delete order
     Route::post('/delete-order/{orderId}', [DashboardOrderController::class, 'deleteOrder']);
@@ -293,11 +358,11 @@ Route::prefix('dashboard')->group(function () {
 
     //taxes
     Route::get('order-tax', [OrderTaxController::class, 'index']);
-    Route::post('order-tax', [OrderTaxController::class,'store']);
+    Route::post('order-tax', [OrderTaxController::class, 'store']);
     Route::post('order-tax/update', [OrderTaxController::class, 'update']);
     Route::post('order-tax/destroy', [OrderTaxController::class, 'destroy']);
 
-    // reports
+    //sales reports
     Route::get('get-reports', [SalesReportController::class, 'totalCompletedOrdersAmount']);
 
     Route::get('return-rate', [SalesReportController::class, 'returnRate']);
@@ -315,6 +380,45 @@ Route::prefix('dashboard')->group(function () {
     Route::get('brand-sales', [SalesReportController::class, 'brandSalesReport']);
 
     Route::get('city-sales', [SalesReportController::class, 'citySalesReport']);
+    // product reports
+    Route::get('profitable-products', [ProductReportController::class, 'mostProfitableProducts']);
+
+    Route::get('abandoned-carts', [ProductReportController::class, 'abandonedCarts']);
+
+    Route::get('notify-products', [ProductReportController::class, 'getNotifyProducts']);
+
+    Route::get('top-selling-products', [ProductReportController::class, 'topSellingProducts']);
+
+    Route::get('get-customer-statistics', [UserReportController::class, 'getCustomerStatistics']);
+
+    Route::get('customer-satisfaction-rating', [UserReportController::class, 'customerSatisfactionRating']);
+
+    Route::get('top-paying-customers', [UserReportController::class, 'topPayingCustomers']);
+
+    // most requested reports
+
+    Route::get('most-requested-days', [MostRequestedReportController::class, 'mostRequestedDays']);
+
+    Route::get('most-requested-hours', [MostRequestedReportController::class, 'mostRequestedHours']);
+
+    Route::get('top-requested-customers', [MostRequestedReportController::class, 'topRequestsCustomers']);
+
+    // most Searched
+
+    Route::get('most-searched-products', [MostSearchedController::class, 'mostSearchedProducts']);
+
+    Route::get('most-searched-words', [MostSearchedController::class, 'mostSearchedWords']);
+
+    // month goal
+    Route::get('/get-goal', [GoalController::class, 'index']);
+    Route::post('/create-goal', [GoalController::class, 'store']);
+    Route::post('/update-goal', [GoalController::class, 'update']);
+    Route::post('/delete-goal', [GoalController::class, 'destroy']);
+
+    // cart analytics
+    Route::get('/get-carts', [CartAnalyticsController::class, 'abandonedCarts']);
+
+    Route::post('/remind-cart/{id}', [CartAnalyticsController::class, 'remindCart']);
 
 });
 
@@ -341,6 +445,8 @@ Route::prefix('website')->middleware(['track.visitors'])->group(function () {
 
     Route::get('/prefer-product', [WebsitePreferProductController::class, 'index']);
     Route::get('/products-search', [WebsiteProductController::class, 'search']);
+
+    Route::get('/products-notify', [WebsiteProductController::class, 'notifyWhenAvailable']);
 
     //banners_sec_one
     Route::get('/get-banners', [WebsiteBannerController::class, 'index']);
@@ -372,7 +478,9 @@ Route::prefix('website')->middleware(['track.visitors'])->group(function () {
     Route::get('/about-store', [WebsiteAboutOurStoreController::class, 'index']);
 
     //about-store
-    Route::get('/exchange-policy', [WebsiteExchangeAndReturnPolicyController::class, 'index']);
+    Route::get('/exchange-policy', [PolicyController::class, 'getExchangeAndReturnPolicy']);
+
+    Route::get('/privacy-policy', [PolicyController::class, 'getPrivacyPolicy']);
 
     // users count
     Route::get('/users-count', [UserController::class, 'usersCount']);
@@ -415,10 +523,26 @@ Route::prefix('website')->middleware(['track.visitors'])->group(function () {
         Route::get('/user-orders', [OrderController::class, 'getUserOrders']);
 
 
+        //Notifications
+        Route::get('/show-unread-notifications', [NotificationController::class, 'showUnreadNotifications']);
+
+        Route::get('/show-read-notifications', [NotificationController::class, 'showReadNotifications']);
+
+        Route::get('/show-all-notifications', [NotificationController::class, 'showAllNotifications']);
+
+        Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead']);
+
+        Route::get('/show-product-review/{id}', [NotificationController::class, 'showProductReview']);
+
+        // questions
+        Route::get('/get-terms-questions', [QuestionController::class, 'getTermsQuestions']);
+
+        Route::get('/get-policy-questions', [QuestionController::class, 'getPrivacyPolicy']);
+
+        Route::get('/get-return-questions', [QuestionController::class, 'getReturnAndExchangePolicy']);
+
+        Route::post('/questions', [QuestionController::class, 'store']);
     });
-
-
-
 });
 
 

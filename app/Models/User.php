@@ -47,4 +47,30 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+
+
+    public function getUnreadNotifications()
+    {
+        return $this->unreadNotifications; // Accessing unread notifications directly
+    }
+
+    /**
+     * Get read notifications.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getReadNotifications()
+    {
+        return $this->notifications()->whereNotNull('read_at')->get(); // Fetch read notifications
+    }
+
+    /**
+     * Get all notifications.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAllNotifications()
+    {
+        return $this->notifications; // Accessing all notifications directly
+    }
 }

@@ -29,9 +29,6 @@ class CheckoutController extends Controller
             'coupon_code' => 'nullable|string' // Validate coupon code if provided
 
         ]);
-
-
-
         $user = Auth::user();
         $cartItems = $request->input('carts');
         $totalAmount = 0;
@@ -48,20 +45,29 @@ class CheckoutController extends Controller
             $totalWeight += $productColorSize->productColor->product->weight *  $cart->quantity;
         }
         $couponCode = $request->input('coupon_code');
+
         if ($couponCode) {
             $coupon = Coupon::where('code', $couponCode)->first();
 
             if ($coupon && $coupon->isValid()) {
+                if ($coupon->hasReachedUserLimit($user)) {
+                    return response()->json(['status' => 'error', 'message' => 'You have reached the usage limit for this coupon'], 400);
+                }
+
                 // Apply coupon discount
                 $totalAmountWithDiscount = $coupon->applyDiscount($totalAmount);
                 $couponDiscountAmount = $totalAmount - $totalAmountWithDiscount;
                 $totalAmount = $totalAmountWithDiscount;
                 // Increment coupon usage
                 $coupon->incrementUsage();
+
+                $coupon->incrementUserUsage($user);
+
             } else {
                 return response()->json(['status' => 'error', 'message' => 'Invalid or expired coupon code'], 400);
             }
         }
+        $coupon_id = Coupon::where('code', $couponCode)->first()->id ?? null;
 
         // Create the order
         $order = Order::create([
@@ -72,7 +78,7 @@ class CheckoutController extends Controller
             'coupon_discount' => $couponDiscountAmount, // Store discount amount
             'status' => 'pending',
             'tracking_number' => Str::uuid(),
-
+            'coupon_id' => $coupon_id,
         ]);
 
         // Create order items
@@ -82,6 +88,7 @@ class CheckoutController extends Controller
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_color_size_id' => $productColorSize->id,
+                'product_id' => $productColorSize->productColor->product->id,
                 'quantity' => $cart->quantity,
                 'price' => $productColorSize->price_after_discount,
             ]);
@@ -199,3 +206,6 @@ class CheckoutController extends Controller
 
 
 }
+
+
+

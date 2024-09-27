@@ -11,6 +11,7 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'product_color_size_id',
+        'product_id',
         'quantity',
         'price',
     ];
@@ -18,6 +19,10 @@ class OrderItem extends Model
     public function productColorSize()
     {
         return $this->belongsTo(ProductColorSize::class,'product_color_size_id');
+    }
+    public function product()
+    {
+        return $this->belongsTo(Product::class,'product_id');
     }
     public function order()
     {

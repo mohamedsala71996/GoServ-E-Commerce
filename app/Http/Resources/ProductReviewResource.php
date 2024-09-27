@@ -23,6 +23,7 @@ class ProductReviewResource extends JsonResource
             'status' => $this->status ?? 'pending',
             'user' => $this->user->name,
             'product' => $this->product->getTranslation('name', app()->getLocale()),
+            'replies' => ReviewReplyResource::collection($this->whenLoaded('replies')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

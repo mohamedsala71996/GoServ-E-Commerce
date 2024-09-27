@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Dashboard;
+namespace App\Http\Controllers\Api\Dashboard\Coupons;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
@@ -29,6 +29,7 @@ class CouponController extends Controller
             'valid_from' => 'nullable|date',
             'valid_until' => 'nullable|date|after_or_equal:valid_from',
             'usage_limit' => 'nullable|integer|min:1',
+            'usage_user_limit' => 'nullable|integer|min:1',
         ]);
 
         $coupon = Coupon::create($request->all());
@@ -177,4 +178,28 @@ class CouponController extends Controller
             'message' => 'Coupon deleted successfully'
         ], 200);
     }
+    public function updateStatus(Request $request , $id)
+    {
+        $coupon = Coupon::find($id);
+
+        if (!$coupon) {
+            return response()->json([
+                'status' => 'error',
+                'code' => 404,
+                'message' => 'Coupon not found'
+            ], 404);
+        }
+
+        $coupon->status=$request->status;
+        $coupon->save();
+
+        return response()->json([
+            'status' => 'success',
+            'code' => 200,
+            'message' => 'Coupon status updated successfully'
+        ], 200);
+    }
+
+
+
 }

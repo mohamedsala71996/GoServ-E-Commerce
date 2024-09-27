@@ -41,8 +41,8 @@ class StoreProductRequest extends FormRequest
             'name.ar' => 'required|string|max:255',
             'description.en' => 'required|string|max:1000',
             'description.ar' => 'required|string|max:1000',
-            'details.en' => 'required|string',
-            'details.ar' => 'required|string',
+            'details.en' => 'nullable|string',
+            'details.ar' => 'nullable|string',
 
             // Category, brand, weight, and other product attributes
             'category_id' => 'required|exists:categories,id',

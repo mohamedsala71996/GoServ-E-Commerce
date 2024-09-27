@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->json('name'); // This will be translatable
             $table->json('description'); // This will be translatable
-            $table->json('details'); // This will be translatable
+            $table->json('details')->nullable(); // This will be translatable
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->foreignId('brand_id')->nullable()->constrained('brands')->onDelete('set null');
             $table->decimal('weight', 8, 2); // Weight with two decimal points

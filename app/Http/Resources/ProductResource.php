@@ -23,7 +23,7 @@ class ProductResource extends JsonResource
             'id' => $this->id,
             'name' => $this->getTranslation('name', app()->getLocale()),
             'description' => $this->getTranslation('description', app()->getLocale()),
-            'details' => $this->getTranslation('details', app()->getLocale()),
+            'details' => $this->getTranslation('details', app()->getLocale()) ?? null,
             'firstPhoto' => $firstPhoto,
             'Photos' =>  $photos,
             'category_name' => $this->category->getTranslation('name', app()->getLocale()),

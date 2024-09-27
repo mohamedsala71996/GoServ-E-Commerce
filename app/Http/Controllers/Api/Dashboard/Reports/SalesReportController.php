@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Dashboard;
+namespace App\Http\Controllers\Api\Dashboard\Reports;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
@@ -204,6 +204,7 @@ class SalesReportController extends Controller
             'data' => $sortedSalesData,
         ], 200);
     }
+
     public function productSalesWithoutSize(Request $request)
     {
         // Get start_date and end_date from request parameters
@@ -217,17 +218,17 @@ class SalesReportController extends Controller
         ]);
 
         // Query to get the total sales for each product
-          $productSales = OrderItem::select('product_colors.product_id')
+          $productSales = OrderItem::select('product_id')
             ->selectRaw('SUM(order_items.quantity) as total_quantity')
             ->selectRaw('SUM(order_items.price * order_items.quantity) as total_sales')
-            ->join('product_color_sizes', 'order_items.product_color_size_id', '=', 'product_color_sizes.id')
-            ->join('product_colors', 'product_color_sizes.product_color_id', '=', 'product_colors.id')
-            ->join('products', 'product_colors.product_id', '=', 'products.id')
+            // ->join('product_color_sizes', 'order_items.product_color_size_id', '=', 'product_color_sizes.id')
+            // ->join('product_colors', 'product_color_sizes.product_color_id', '=', 'product_colors.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->whereIn('orders.status', ['accepted', 'out for delivery', 'delivered']) // Add status filter
             ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->groupBy('product_id')
-            ->with('productColorSize.productColor.product') // Load relationships
+            ->with('product') // Load relationships
             ->get();
 
         // Format the data for response
@@ -272,9 +273,9 @@ class SalesReportController extends Controller
         $categorySales = OrderItem::select('products.category_id')
             ->selectRaw('SUM(order_items.quantity) as total_quantity')
             ->selectRaw('SUM(order_items.price * order_items.quantity) as total_sales')
-            ->join('product_color_sizes', 'order_items.product_color_size_id', '=', 'product_color_sizes.id')
-            ->join('product_colors', 'product_color_sizes.product_color_id', '=', 'product_colors.id')
-            ->join('products', 'product_colors.product_id', '=', 'products.id')
+            // ->join('product_color_sizes', 'order_items.product_color_size_id', '=', 'product_color_sizes.id')
+            // ->join('product_colors', 'product_color_sizes.product_color_id', '=', 'product_colors.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('categories', 'products.category_id', '=', 'categories.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->whereIn('orders.status', ['accepted', 'out for delivery', 'delivered']) // Add status filter
@@ -317,9 +318,9 @@ class SalesReportController extends Controller
     $brandSales = OrderItem::select('products.brand_id')
         ->selectRaw('SUM(order_items.quantity) as total_quantity')
         ->selectRaw('SUM(order_items.price * order_items.quantity) as total_sales')
-        ->join('product_color_sizes', 'order_items.product_color_size_id', '=', 'product_color_sizes.id')
-        ->join('product_colors', 'product_color_sizes.product_color_id', '=', 'product_colors.id')
-        ->join('products', 'product_colors.product_id', '=', 'products.id')
+        // ->join('product_color_sizes', 'order_items.product_color_size_id', '=', 'product_color_sizes.id')
+        // ->join('product_colors', 'product_color_sizes.product_color_id', '=', 'product_colors.id')
+        ->join('products', 'order_items.product_id', '=', 'products.id')
         ->join('brands', 'products.brand_id', '=', 'brands.id')
         ->join('orders', 'order_items.order_id', '=', 'orders.id')
         ->whereIn('orders.status', ['accepted', 'out for delivery', 'delivered']) // Add status filter

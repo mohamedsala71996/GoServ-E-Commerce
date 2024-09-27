@@ -24,6 +24,8 @@ class StoreExchangeAndReturnPolicyRequest extends FormRequest
         return [
             'description.en' => 'required|string', // English description is required
             'description.ar' => 'required|string', // Arabic description is required
+            'status' => 'nullable|in:active,inactive', // Status must be either 'active' or 'inactive'
+
         ];
     }
 }

@@ -25,7 +25,7 @@ class StoreProductReviewRequest extends FormRequest
             'user_id' => 'nullable|exists:users,id',
             'product_id' => 'required|exists:products,id',
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string',
+            'comment' => 'required|string|max:5000',
             'status' => 'in:pending,approved,rejected',
         ];
     }

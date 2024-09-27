@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('exchange_and_return_policies', function (Blueprint $table) {
             $table->id();
             $table->json('description'); // This will be translatable
+            $table->enum('status', ['active', 'inactive'])->default('inactive'); // Add status enum with default value
             $table->timestamps();
         });
     }

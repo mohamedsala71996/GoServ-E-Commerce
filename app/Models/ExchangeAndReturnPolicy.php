@@ -12,6 +12,7 @@ class ExchangeAndReturnPolicy extends Model
 
     protected $fillable = [
         'description',
+        'status',
     ];
 
     public $translatable = ['description'];

@@ -12,13 +12,15 @@ class Cart extends Model
     protected $fillable = [
         'user_id',
         'quantity',
-        'product_color_size_id'
+        'product_color_size_id',
+        'reminder'
     ];
 
     /**
      * Get the user that owns the cart item.
      */
     public function user()
+
     {
         return $this->belongsTo(User::class);
     }

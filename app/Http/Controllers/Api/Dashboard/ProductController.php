@@ -8,14 +8,17 @@ use App\Http\Requests\Api\Dashboard\StoreProductRequest;
 use App\Http\Requests\Api\Dashboard\UpdateProductRequest;
 use App\Http\Resources\ProductDashboardResource;
 use App\Http\Resources\ShortDataProductResource;
+use App\Mail\ProductAvailable;
 use App\Models\Admin;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductColor;
 use App\Models\ProductColorSize;
+use App\Models\ProductNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -135,7 +138,15 @@ class ProductController extends Controller
                             if (isset($size['id'])) {
                                 // Update existing size
                                 $productColorSize = ProductColorSize::findOrFail($size['id']);
-                                $productColorSize->update($size);
+                               $notifies= ProductNotification::where('notified', 0)->get();
+                                    foreach ($notifies as $notify) {
+                                        if ($notify->product_color_size_id == $productColorSize->id && $productColorSize->quantity == 0 ) {
+                                            Mail::to($notify->email)->send(new ProductAvailable($productColorSize->productColor->product));
+                                            $notify->notified = 1;
+                                            $notify->save();
+                                        }
+                                    }
+                                    $productColorSize->update($size);
                             } else {
                                 // Create new size
                                 $productColor->productColorSizes()->create($size);
@@ -233,4 +244,7 @@ class ProductController extends Controller
             'data' => $sizes
         ], 200);
     }
+
+
+
 }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_color_size_id')->constrained('product_color_sizes')->onDelete('cascade'); // Updated column name
             $table->integer('quantity')->default(1);
+            $table->boolean('reminder')->nullable();
             $table->timestamps();
         });
     }
